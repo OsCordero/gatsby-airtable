@@ -8,7 +8,6 @@ import NavLink from "./NavLink";
 
 const Navbar = ({ setIsSidebarOpen }) => {
   const uniqueLinks = [...new Set(links.map(({ page }) => page))];
-  console.log(uniqueLinks);
 
   return (
     <Wrapper>
