@@ -4,6 +4,7 @@ import Image from "gatsby-image";
 import Title from "./Title";
 import algoliasearch from "algoliasearch/lite";
 import { InstantSearch, SearchBox, connectHits } from "react-instantsearch-dom";
+import algoliaImg from "../images/algolia.svg";
 
 const searchClient = algoliasearch(
   process.env.GATSBY_ALGOLIA_APP_ID,
@@ -31,6 +32,10 @@ const Search = () => {
         searchClient={searchClient}
       >
         <SearchBox />
+        <div className="img-wrapper">
+          <span>Powered by: </span>
+          <img src={algoliaImg} alt="algolia logo" className="algolia" />
+        </div>
         <Container className="section-center">
           <CustomHits />
         </Container>
@@ -41,11 +46,23 @@ const Search = () => {
 
 const Wrapper = styled.section`
   padding: 5rem 0;
+  .img-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    .algolia {
+      width: 3rem;
+      display: inline-block;
+      margin-left: 1rem;
+    }
+  }
+
   .ais-SearchBox {
     width: 90vw;
     max-width: 400px;
     margin: 0 auto;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     form {
       width: 100%;
       display: grid;
