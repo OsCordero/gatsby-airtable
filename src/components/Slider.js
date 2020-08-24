@@ -1,14 +1,88 @@
-import React from "react"
-import { graphql, useStaticQuery } from "gatsby"
-import Title from "./Title"
-import styled from "styled-components"
-import Image from "gatsby-image"
-import { FaQuoteRight } from "react-icons/fa"
-import { FiChevronRight, FiChevronLeft } from "react-icons/fi"
+import React, { useState, useEffect } from "react";
+import { graphql, useStaticQuery } from "gatsby";
+import Title from "./Title";
+import styled from "styled-components";
+import Image from "gatsby-image";
+import { FaQuoteRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+
+const query = graphql`
+  {
+    allAirtable(filter: { table: { eq: "Customers" } }) {
+      nodes {
+        id
+        data {
+          name
+          quote
+          title
+          image {
+            localFiles {
+              childImageSharp {
+                fluid {
+                  ...GatsbyImageSharpFluid
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 const Slider = () => {
-  return <h2>slider component</h2>
-}
+  const {
+    allAirtable: { nodes: customers },
+  } = useStaticQuery(query);
+
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const lastIndex = customers.length - 1;
+    if (active < 0) setActive(lastIndex);
+    if (active > lastIndex) setActive(0);
+  }, [active, customers]);
+
+  return (
+    <Wrapper className="section">
+      <Title title="Reviews" />
+      <div className="section-center">
+        {customers.map((customer, index) => {
+          const {
+            id,
+            data: { image, name, title, quote },
+          } = customer;
+
+          const maybeActive = index === active ? "activeSlide" : "nextSlide";
+          const isLastSlide =
+            index === active - 1 ||
+            (active === 0 && index === customers.length - 1);
+
+          return (
+            <article
+              className={isLastSlide ? "lastSlide" : maybeActive}
+              key={id}
+            >
+              <Image
+                fluid={image.localFiles[0].childImageSharp.fluid}
+                className="img"
+              />
+              <h4>{name}</h4>
+              <p className="title">{title}</p>
+              <div className="text">{quote}</div>
+              <FaQuoteRight className="icons" />
+            </article>
+          );
+        })}
+        <button className="prev" onClick={() => setActive(active - 1)}>
+          <FaChevronLeft />
+        </button>
+        <button className="next" onClick={() => setActive(active + 1)}>
+          <FaChevronRight />
+        </button>
+      </div>
+    </Wrapper>
+  );
+};
 
 const Wrapper = styled.div`
   background: var(--clr-grey-10);
@@ -23,7 +97,10 @@ const Wrapper = styled.div`
     overflow: hidden;
     .img {
       border-radius: 50%;
+      margin: 0 auto;
       margin-bottom: 1rem;
+      width: 150px;
+      height: 150px;
     }
     h4 {
       text-transform: uppercase;
@@ -100,5 +177,5 @@ const Wrapper = styled.div`
       transform: translateX(100%);
     }
   }
-`
-export default Slider
+`;
+export default Slider;

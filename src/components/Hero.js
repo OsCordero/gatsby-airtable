@@ -1,11 +1,47 @@
-import React from "react"
-import Background from "./Background"
-import styled from "styled-components"
-import { Link } from "gatsby"
-import { FiChevronRight, FiChevronLeft } from "react-icons/fi"
-const Hero = () => {
-  return <h2>hero component</h2>
-}
+import React, { useState, useEffect } from "react";
+import Background from "./Background";
+import styled from "styled-components";
+import { Link } from "gatsby";
+import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
+const Hero = ({ projects }) => {
+  const images = projects.map(
+    project => project.data.image.localFiles[0].childImageSharp.fluid
+  );
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const lastIndex = images.length - 1;
+    if (active > lastIndex) setActive(0);
+    if (active < 0) setActive(lastIndex);
+  }, [active, images]);
+  return (
+    <Wrapper>
+      <Background image={images[active]}>
+        <article>
+          <h3>If you can dream it we can create it</h3>
+          <h1>Let your home be unique and stylish</h1>
+          <Link to="/projects">Projects</Link>
+        </article>
+        <button className="prev-btn" onClick={() => setActive(active - 1)}>
+          <FiChevronLeft />
+        </button>
+        <button className="next-btn" onClick={() => setActive(active + 1)}>
+          <FiChevronRight />
+        </button>
+        <div className="dots">
+          {images.map((_, index) => (
+            <button
+              aria-label="active-background"
+              key={index}
+              className={active === index ? "active" : ""}
+              onClick={() => setActive(index)}
+            ></button>
+          ))}
+        </div>
+      </Background>
+    </Wrapper>
+  );
+};
 
 const Wrapper = styled.section`
   article {
@@ -94,13 +130,13 @@ const Wrapper = styled.section`
     transform: translateX(-50%);
     display: flex;
     justify-content: center;
-    span {
+    button {
       display: block;
       cursor: pointer;
       height: 0.75rem;
       width: 0.75rem;
       border-radius: 50%;
-      background: var(--clr-white);
+      background: transparent;
       margin: 0 1rem;
       border: 2px solid var(--clr-white);
       @media (min-width: 800px) {
@@ -110,10 +146,10 @@ const Wrapper = styled.section`
         }
       }
     }
-    span.active {
-      background-color: transparent;
+    button.active {
+      background-color: var(--clr-white);
     }
   }
-`
+`;
 
-export default Hero
+export default Hero;

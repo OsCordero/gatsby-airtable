@@ -1,14 +1,35 @@
-import React, { useContext } from "react"
+import React from "react";
 
-import styled from "styled-components"
-import { Link } from "gatsby"
-const NavLink = () => {
-  return <h2>navlink</h2>
-}
+import styled from "styled-components";
+import { Link } from "gatsby";
+import links from "../constants/links";
+
+const NavLink = ({ page }) => {
+  return (
+    <Wrapper>
+      <button>{page}</button>
+      <div className="links">
+        {links
+          .filter(link => link.page === page)
+          .map((link, index) => {
+            const { url, label, icon } = link;
+            return (
+              <Link to={url} key={index}>
+                {icon}
+                {label}
+              </Link>
+            );
+          })}
+        <div className="caret"></div>
+      </div>
+    </Wrapper>
+  );
+};
 
 const Wrapper = styled.li`
   padding: 1rem 0;
   position: relative;
+  cursor: pointer;
   button {
     color: var(--clr-white);
     background: transparent;
@@ -20,6 +41,7 @@ const Wrapper = styled.li`
     width: 100%;
     text-transform: capitalize;
     position: relative;
+    cursor: pointer;
   }
   .links {
     position: absolute;
@@ -34,6 +56,8 @@ const Wrapper = styled.li`
     grid-template-columns: 1fr 1fr;
     gap: 1rem 2rem;
     grid-gap: 1rem 4rem;
+    transition: all 0.6s;
+    opacity: 0;
     a {
       display: grid;
       grid-template-columns: auto 1fr;
@@ -56,6 +80,7 @@ const Wrapper = styled.li`
   }
   &:hover .links {
     visibility: visible;
+    opacity: 1;
   }
   .caret {
     display: block;
@@ -69,6 +94,6 @@ const Wrapper = styled.li`
     left: 50%;
     transform: translateX(-50%);
   }
-`
+`;
 
-export default NavLink
+export default NavLink;

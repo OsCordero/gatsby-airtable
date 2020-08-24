@@ -1,12 +1,93 @@
-import React, { useEffect, useState } from "react"
-import Title from "./Title"
-import styled from "styled-components"
-import base from "./Airtable"
-import { FaVoteYea } from "react-icons/fa"
+import React, { useEffect, useState } from "react";
+import Title from "./Title";
+import styled from "styled-components";
+import base from "./Airtable";
+import { FaVoteYea } from "react-icons/fa";
 
 const Survey = () => {
-  return <h2>survey component</h2>
-}
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const getRecords = async () => {
+    setLoading(true);
+
+    const records = await base("Survey")
+      .select({})
+      .firstPage()
+      .catch(err => console.log(err));
+
+    const newItems = records.map(({ id, fields }) => ({
+      id,
+      fields,
+    }));
+
+    setItems(newItems);
+    setLoading(false);
+  };
+  const giveVote = async idToVote => {
+    setLoading(true);
+
+    const updatedItems = items.map(item => {
+      const { id, fields } = item;
+      if (id === idToVote) {
+        return { id, fields: { ...fields, votes: fields.votes + 1 } };
+      } else {
+        return item;
+      }
+    });
+
+    const records = await base("Survey")
+      .update(updatedItems)
+      .catch(err => console.log(err));
+
+    const newItems = records.map(({ id, fields }) => ({
+      id,
+      fields,
+    }));
+
+    setItems(newItems);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getRecords();
+  }, []);
+
+  return (
+    <Wrapper className="section">
+      <div className="container">
+        <Title title="survey" />
+        <h3>most important room in the house?</h3>
+        {loading ? (
+          <h3>loading...</h3>
+        ) : (
+          <ul>
+            {items.map(item => {
+              const {
+                id,
+                fields: { name, votes },
+              } = item;
+              return (
+                <li key={id}>
+                  <div className="key">
+                    {name.toUpperCase().substring(0, 2)}
+                  </div>
+                  <div>
+                    <h4>{name}</h4>
+                    <p>{votes} votes</p>
+                  </div>
+                  <button onClick={() => giveVote(id)}>
+                    <FaVoteYea />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </Wrapper>
+  );
+};
 
 const Wrapper = styled.section`
   .container {
@@ -68,5 +149,5 @@ const Wrapper = styled.section`
       }
     }
   }
-`
-export default Survey
+`;
+export default Survey;
